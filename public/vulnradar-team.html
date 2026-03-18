@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>VulnRadar — Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── VULNRADAR SHARED STYLES ── paste into each page <style> block ── */
+
+:root {
+  --bg:#080c12; --bg2:#0d1420; --bg3:#111927;
+  --surface:#131d2e; --surface2:#1a2640;
+  --border:#1e3050; --border2:#243760;
+  --text:#e8edf5; --text2:#8fa3c0; --text3:#4d6380;
+  --cyan:#00d4ff; --cyan-dim:rgba(0,212,255,0.12); --cyan-glow:rgba(0,212,255,0.3);
+  --green:#00ff88; --green-dim:rgba(0,255,136,0.1);
+  --red:#ff3d5a; --red-dim:rgba(255,61,90,0.12);
+  --orange:#ff8c42; --orange-dim:rgba(255,140,66,0.12);
+  --yellow:#ffd166; --yellow-dim:rgba(255,209,102,0.12);
+  --purple:#a78bfa; --purple-dim:rgba(167,139,250,0.12);
+  --font-display:'Syne',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --font-body:'Inter',sans-serif;
+  --sidebar-w:260px; --topbar-h:64px;
+  --radius:8px; --radius-lg:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg2);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:relative;overflow:hidden;}
+.sidebar::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,var(--cyan-dim) 0%,transparent 70%);pointer-events:none;}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.logo-icon{width:36px;height:36px;background:var(--cyan);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--cyan-glow);flex-shrink:0;}
+.logo-icon svg{width:20px;height:20px;color:var(--bg);}
+.logo-text{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.logo-text span{color:var(--cyan);}
+.sidebar-workspace{padding:14px 16px;margin:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:10px;transition:border-color .2s;}
+.sidebar-workspace:hover{border-color:var(--border2);}
+.ws-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--font-display);flex-shrink:0;}
+.ws-info{flex:1;min-width:0;}
+.ws-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ws-plan{font-size:11px;color:var(--cyan);font-family:var(--font-mono);}
+.sidebar-nav{flex:1;padding:8px 12px;overflow-y:auto;}
+.nav-section-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;padding:16px 8px 6px;font-family:var(--font-mono);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);color:var(--text2);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;margin-bottom:2px;}
+.nav-item:hover{background:var(--surface);color:var(--text);}
+.nav-item.active{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+.nav-icon{width:16px;height:16px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;font-family:var(--font-mono);}
+.nav-badge.c{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.3);}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--radius);cursor:pointer;transition:background .15s;}
+.user-card:hover{background:var(--surface);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,#ff3d5a,#a78bfa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-display);flex-shrink:0;}
+.user-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+
+/* TOPBAR */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:var(--topbar-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;}
+.topbar-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);flex:1;}
+.topbar-title span{color:var(--text3);font-weight:400;font-size:14px;margin-left:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--font-body);text-decoration:none;white-space:nowrap;}
+.btn svg{width:15px;height:15px;flex-shrink:0;}
+.btn-primary{background:var(--cyan);color:var(--bg);box-shadow:0 0 20px var(--cyan-glow);}
+.btn-primary:hover{background:#22e0ff;transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,61,90,.3);}
+.btn-danger:hover{background:rgba(255,61,90,.2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* PAGE */
+.page{flex:1;overflow-y:auto;padding:28px;animation:pageIn .3s ease;}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.panel-title{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.panel-title svg{width:15px;height:15px;color:var(--cyan);}
+.panel-actions{display:flex;gap:8px;align-items:center;}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;padding:10px 20px;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);background:var(--bg2);border-bottom:1px solid var(--border);}
+.data-table td{padding:14px 20px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr{transition:background .15s;cursor:pointer;}
+.data-table tbody tr:hover{background:var(--surface2);}
+
+/* BADGES */
+.risk-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-mono);}
+.risk-badge::before{content:'';width:6px;height:6px;border-radius:50%;}
+.risk-critical{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,61,90,.3);}
+.risk-critical::before{background:var(--red);box-shadow:0 0 6px var(--red);}
+.risk-high{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,140,66,.3);}
+.risk-high::before{background:var(--orange);}
+.risk-medium{background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(255,209,102,.3);}
+.risk-medium::before{background:var(--yellow);}
+.risk-low{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,136,.3);}
+.risk-low::before{background:var(--green);}
+
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;font-family:var(--font-mono);letter-spacing:.3px;}
+.tag-cyan{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.25);}
+.tag-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,136,.25);}
+.tag-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,61,90,.25);}
+.tag-orange{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,140,66,.25);}
+.tag-purple{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.25);}
+.tag-gray{background:var(--bg3);color:var(--text3);border:1px solid var(--border);}
+
+/* FORM */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+.form-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-size:13.5px;font-family:var(--font-body);outline:none;transition:border-color .2s,box-shadow .2s;}
+.form-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-dim);}
+.form-input::placeholder{color:var(--text3);}
+.form-hint{font-size:11.5px;color:var(--text3);margin-top:5px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* SEARCH */
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;width:240px;transition:border-color .2s;}
+.search-box:focus-within{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-dim);}
+.search-box svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;font-family:var(--font-body);}
+.search-box input::placeholder{color:var(--text3);}
+
+/* MISC */
+.icon-btn{width:36px;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--text2);position:relative;}
+.icon-btn:hover{border-color:var(--border2);color:var(--text);}
+.icon-btn svg{width:16px;height:16px;}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg2);}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pulse 1.5s ease-in-out infinite;display:inline-block;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.mini-btn{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-mono);transition:all .15s;}
+.mini-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.divider{height:1px;background:var(--border);margin:8px 0;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-state svg{width:48px;height:48px;margin-bottom:16px;opacity:.3;}
+.empty-state h3{color:var(--text2);font-size:15px;font-family:var(--font-display);margin-bottom:8px;}
+.empty-state p{font-size:13px;}
+
+/* TOGGLE */
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);border-radius:24px;cursor:pointer;transition:.2s;}
+.toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:var(--text3);border-radius:50%;transition:.2s;}
+.toggle input:checked+.toggle-slider{background:var(--cyan-dim);border-color:var(--cyan);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow);}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,12,18,.85);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:480px;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:slideUp .2s ease;}
+.modal-lg{width:640px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text);}
+.modal-close{color:var(--text3);cursor:pointer;transition:color .15s;}
+.modal-close:hover{color:var(--text);}
+.modal-close svg{width:20px;height:20px;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* SCORE BAR */
+.score-bar-wrap{display:flex;align-items:center;gap:10px;}
+.score-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;max-width:80px;}
+.score-bar-fill{height:100%;border-radius:3px;}
+.score-num{font-family:var(--font-mono);font-size:12px;color:var(--text2);width:26px;text-align:right;}
+
+
+.member-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:10px;transition:all .2s;}
+.member-card:hover{border-color:var(--border2);}
+.member-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;font-family:var(--font-display);flex-shrink:0;}
+.member-info{flex:1;}
+.member-name{font-weight:600;font-size:14px;color:var(--text);margin-bottom:3px;}
+.member-email{font-size:12px;color:var(--text3);font-family:var(--font-mono);}
+.role-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-mono);}
+.role-owner{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.3);}
+.role-admin{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.3);}
+.role-member{background:var(--bg3);color:var(--text3);border:1px solid var(--border);}
+.invite-box{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:32px;text-align:center;cursor:pointer;transition:all .2s;}
+.invite-box:hover{border-color:var(--cyan);background:var(--cyan-dim);}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <span class="logo-text">Vuln<span>Radar</span></span>
+  </div>
+  <div class="sidebar-workspace">
+    <div class="ws-avatar">AC</div>
+    <div class="ws-info"><div class="ws-name">Acme Agency</div><div class="ws-plan">Agency Plan</div></div>
+    <span style="color:var(--text3);margin-left:auto;font-size:11px;">▾</span>
+  </div>
+  <nav class="sidebar-nav"><div class="nav-section-label">Overview</div>
+<a class="nav-item" href="vulnradar-dashboard.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+<a class="nav-item" href="vulnradar-sites.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Sites<span class="nav-badge c">12</span>
+    </a>
+<a class="nav-item" href="vulnradar-scans.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Scans
+    </a>
+<div class="nav-section-label">Security</div>
+<a class="nav-item" href="vulnradar-findings.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Findings<span class="nav-badge ">7</span>
+    </a>
+<a class="nav-item" href="vulnradar-reports.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Reports
+    </a>
+<a class="nav-item" href="vulnradar-monitoring.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Monitoring
+    </a>
+<div class="nav-section-label">Workspace</div>
+<a class="nav-item active" href="vulnradar-team.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Team
+    </a>
+<a class="nav-item" href="vulnradar-api.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      API Keys<span class="tag tag-cyan" style="margin-left:auto;font-size:9px;">PRO</span>
+    </a>
+<a class="nav-item" href="vulnradar-billing.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Billing
+    </a>
+<a class="nav-item" href="vulnradar-settings.html">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a></nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">AH</div>
+      <div><div class="user-name">Ahmad Hassan</div><div class="user-role">Owner · Agency</div></div>
+      <svg style="width:14px;height:14px;color:var(--text3);margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </div>
+  </div>
+</aside>
+<div class="main">
+<header class="topbar">
+  <div class="topbar-title">Team<span>/ Members & Permissions</span>
+  </div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search…" />
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-dot"></span></div>
+    
+  </div>
+</header>
+<main class="page">
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:10px;">Team Members</div>
+    <div style="font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--cyan);line-height:1;">4</div>
+  </div><div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:10px;">Active Sessions</div>
+    <div style="font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--green);line-height:1;">3</div>
+  </div><div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:10px;">Pending Invites</div>
+    <div style="font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--purple);line-height:1;">1</div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Team Members
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="document.getElementById('inviteModal').style.display='flex'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Invite Member
+    </button>
+  </div>
+  <div style="padding:16px 20px;">
+  
+  <div class="member-card">
+    <div class="member-avatar" style="background:linear-gradient(135deg,#ff3d5a,#a78bfa);">AH</div>
+    <div class="member-info">
+      <div class="member-name">Ahmad Hassan</div>
+      <div class="member-email">ahmad@acmeagency.com</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <span class="role-badge role-owner">Owner</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">Active now</span>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:12px;">
+      
+    </div>
+  </div>
+  <div class="member-card">
+    <div class="member-avatar" style="background:linear-gradient(135deg,#00d4ff,#a78bfa);">SA</div>
+    <div class="member-info">
+      <div class="member-name">Sara Ahmed</div>
+      <div class="member-email">sara@acmeagency.com</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <span class="role-badge role-admin">Admin</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">2 hrs ago</span>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:12px;">
+      <button class="mini-btn">Edit Role</button><button class="mini-btn" style="color:var(--red);">Remove</button>
+    </div>
+  </div>
+  <div class="member-card">
+    <div class="member-avatar" style="background:linear-gradient(135deg,#00ff88,#00d4ff);">MK</div>
+    <div class="member-info">
+      <div class="member-name">Malik Khan</div>
+      <div class="member-email">malik@acmeagency.com</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <span class="role-badge role-member">Member</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">Yesterday</span>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:12px;">
+      <button class="mini-btn">Edit Role</button><button class="mini-btn" style="color:var(--red);">Remove</button>
+    </div>
+  </div>
+  <div class="member-card">
+    <div class="member-avatar" style="background:linear-gradient(135deg,#ffd166,#ff8c42);">FZ</div>
+    <div class="member-info">
+      <div class="member-name">Fatima Zahra</div>
+      <div class="member-email">fatima@acmeagency.com</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <span class="role-badge role-member">Member</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">3 days ago</span>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:12px;">
+      <button class="mini-btn">Edit Role</button><button class="mini-btn" style="color:var(--red);">Remove</button>
+    </div>
+  </div>
+
+  <!-- Pending Invite -->
+  <div class="member-card" style="opacity:.6;border-style:dashed;">
+    <div class="member-avatar" style="background:var(--bg3);border:2px dashed var(--border2);">?</div>
+    <div class="member-info">
+      <div class="member-name" style="color:var(--text3);">Invite Pending</div>
+      <div class="member-email">zain@client.com</div>
+    </div>
+    <span class="tag tag-orange">Pending</span>
+    <button class="mini-btn" style="margin-left:12px;">Resend</button>
+    <button class="mini-btn" style="color:var(--red);">Cancel</button>
+  </div>
+
+  <div class="invite-box" onclick="document.getElementById('inviteModal').style.display='flex'">
+    <div style="font-size:24px;margin-bottom:8px;">+</div>
+    <div style="font-weight:600;color:var(--text2);">Invite a team member</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px;">Add colleagues to collaborate on security monitoring</div>
+  </div>
+  </div>
+</div>
+
+<!-- Permissions Table -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Role Permissions
+    </div>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Permission</th><th>Owner</th><th>Admin</th><th>Member</th></tr></thead>
+    <tbody>
+    <tr>
+      <td style="font-size:13px;color:var(--text2);">Add / remove sites</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Trigger scans</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">View findings</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Download reports</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Generate white-label reports</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Manage team members</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Manage billing</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Access API keys</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr><tr>
+      <td style="font-size:13px;color:var(--text2);">Delete workspace</td>
+      <td><span style="color:var(--green);">✓</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+      <td><span style="color:var(--text3);">—</span></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Invite Modal -->
+<div id="inviteModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Invite Team Member</div>
+      <div class="modal-close" onclick="document.getElementById('inviteModal').style.display='none'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="colleague@company.com"/></div>
+      <div class="form-group"><label class="form-label">Role</label>
+        <select class="form-input"><option>Member — View and download reports</option><option>Admin — Full access except billing</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Message (optional)</label><textarea class="form-input" rows="3" placeholder="Add a personal message…" style="resize:none;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('inviteModal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary">Send Invitation</button>
+    </div>
+  </div>
+</div>
+</main>
+</div>
+</div>
+
+</body>
+</html>
